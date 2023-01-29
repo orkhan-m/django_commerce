@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div>
+        {% if user.is_authenticated %}
+            {% if isWatchlist %}
+                <form action="{% url 'removeWatchlist' id=item.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remove from Watchlist</button>
+                </form>
+            {% else %}
+                <form action="{% url 'addWatchlist' id=item.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Add to Watchlist</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    <h2>Item: {{ item.title }}</h2>
+    <h4>Category: {{ item.category }}</h4>
+    <img src="{{ item.image_url }}" alt="Image {{ item.title }}" height="400">
+    <p>{{ item.description }}</p>
+    <h3>Price: ${{ item.initial_price }}</h3>
+
+{% endblock %}

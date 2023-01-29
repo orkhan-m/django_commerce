@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist Listings</h2>
+    <hr>
+    
+    <form action="{% url 'filter' %}" method="post">
+    {% csrf_token %}
+        <select name="selected_category" class="selectpicker" data-style="btn-info">
+            <option value="all">All</option>
+            {% for category in categories %}
+            <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Apply Filter">
+    </form>
+
+    <hr>
+    <div class="row mx-3">
+    {% for item in watchlist_items %}
+        <div class="card" style="width: 18rem;">  
+            <img class="card-img-top" src="{{ item.image_url }}" alt="{{ item.title }} image" style="height: 18rem; border: 1px gainsboro solid;">
+            <div class="card-body" style=" display: flex; flex-direction: column;">
+                <h5 class="card-title">{{ item.title }}</h5>
+                <p class="card-text">{{ item.description }}</p>
+                <p class="card-text">${{ item.price }}</p>
+                <a href="{% url 'listing_ind' id=item.id %}" class="btn btn-primary" style="margin-top: auto;">See More</a>
+            </div>
+        </div>   
+    {% endfor %}
+    </div>
+    
+{% endblock %}

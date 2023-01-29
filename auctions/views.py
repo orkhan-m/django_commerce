@@ -15,6 +15,7 @@ def create_listing(request):
         })
     elif request.method == "POST":
         title = request.POST["title"]
+        # NOTE to pass a foreign to Auction table, we need to retrieve it through Primary Key table
         category = Category.objects.get(category=request.POST["category"])
         image_url = request.POST["url"]
         description = request.POST["description"]
@@ -40,29 +41,63 @@ def create_listing(request):
 
         })
 
-        new_listing = ListingModel(
-                        title=title, 
-                        image_url=url, 
-                        description=description, 
-                        category=category, 
-                        price=initial_price, 
-                        active=status, 
-                        owner=User.objects.get(username = owner))
-        new_listing.save()
-
+def filter(request):
+    if request.method == "POST":
+        category_filtered = request.POST['selected_category']
+        if category_filtered == "all":
+            activeItems = Auction.objects.filter(is_active=True)
+            return render(request, "auctions/index.html", {
+            "items" : activeItems,
+            "categories" : Category.objects.all()
+            #Auction.category_choices
+        })
+        else:
+            category_filtered_pk = Category.objects.get(category=category_filtered)
+            activeItems = Auction.objects.filter(is_active=True, category=category_filtered_pk)
+            return render(request, "auctions/index.html", {
+            "items" : activeItems,
+            "categories" : Category.objects.all()
+            #Auction.category_choices
+        })    
 
 def watchlist(request):
-    pass
+    currentUser = request.user
+    # NOTE auction_watclist is RELATED_NAME. We use to access foreign key data for User (different models)
+    items = currentUser.auction_watchlist.all()
+    return render(request, "auctions/watchlist.html", {
+        "watchlist_items" : items
+    })
+
+# NOTE Use "render(request, ..." when you want to return a template with passed data
+# Use HttpResonse... when you want to redirect user to different URL or/and just make database changes
+def addWatchlist(request, id):
+    item = Auction.objects.get(pk=id)
+    currentUser = request.user
+    item.watchlist.add(currentUser)
+    return HttpResponseRedirect(reverse("auctions/auction_details", args=(id, )))
+
+
+def removeWatchlist(request, id):
+    item = Auction.objects.get(pk=id)
+    currentUser = request.user
+    item.watchlist.add(currentUser)
+    return HttpResponseRedirect(reverse("auctions/auction_details", args=(id, )))
 
 def index(request):
     items = Auction.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
         "items" : items,
-        "categories" : Category.categories
+        "categories" : Category.objects.all()
     })
 
-def auction_details(request):
-    pass
+# NOTE auction_detailse(request, ID - id is taken from HTML
+# NOTE id here is taken from HTML, however HTML gets the id here: href="{% url 'auction_details' id=item.id %}"
+# which means that the id should be first passed to HTML through Django views.py
+def auction_details(request, id):
+    item = Auction.objects.get(pk=id)
+    return render(request, "auctions/auction_details.html", {
+        "item" : item,
+    })
 
 def login_view(request):
     if request.method == "POST":
