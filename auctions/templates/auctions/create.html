@@ -1,7 +1,47 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Create Listings</h2>
+    <h2>Your Listing.</h2>
 
-    TODO
+    <form method="post" action="{% url 'create_listing' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input class="form-control" type="text" name="title" placeholder="Title">
+            <small id="titleHelp" class="form-text text-muted">Your title will be visable to other users.</small>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select class="form-control" name="category">
+                {% for category in categories %}
+                <option value="{{ category }}">
+                    {{ category }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="category">Picture URL</label>
+            <input class="form-control" type="text" name="url" placeholder="URL">
+            <small id="urlhelp" class="form-text text-muted">The picture will disappear if URL content changes.</small>
+        </div>
+        <div class="form-group">
+            <label for="Description">Description</label>
+            <textarea class="form-control" type="text" name="description" placeholder="Description" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="initial_price">Initial Price</label>
+            <input class="form-control" type="number" name="initial_price" placeholder="Price" min="0">
+        </div>
+        <div>
+            <label>Active: </label>
+            <input type="checkbox" name="status" checked="True" readonly>
+        </div>
+        <div class="form-group">
+            <label for="owner">Owner: </label>
+            <input class="form-control" type="text" name="owner" readonly value="{{ user.username }}">
+        </div>
+        <input type="submit" class="btn btn-primary">
+    </form>
+
 {% endblock %}

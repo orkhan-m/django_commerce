@@ -12,15 +12,18 @@ class Category(models.Model):
     ("Agility", "Agility")
     ]
 
-    category = models.CharField(max_length=20, null=True, blank=True, choices=categories)
+    category = models.CharField(max_length=20, choices=categories, default="Strength", unique=True)
+
+    def __str__(self):
+        return f"{self.category}"
 
 class Auction(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=2000)
     image_url = models.CharField(max_length=2000)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="auction_category")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="auction_category", null=True, blank=True)
     initial_price = models.FloatField()
-    last_price = models.FloatField()
+    last_price = models.FloatField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     watchlist = models.ManyToManyField(User, related_name="auction_watchlist")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auction_user")

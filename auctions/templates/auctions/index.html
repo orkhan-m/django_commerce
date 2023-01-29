@@ -2,6 +2,22 @@
 
 {% block body %}
     <h2>Active Listings</h2>
+    <hr>
 
-    TODO
+    <hr>
+    <div class="row mx-3">
+    {% for item in items %}
+        <div class="card" style="width: 18rem;">  
+            <img class="card-img-top" src="{{ item.image_url }}" alt="{{ item.title }} image" style="height: 18rem; border: 1px gainsboro solid;">
+            <div class="card-body" style=" display: flex; flex-direction: column;">
+                <h5 class="card-title">{{ item.title }}</h5>
+                <h4 class="card-text">Category: {{ item.category }}</h4>
+                <p class="card-text">{{ item.description }}</p>
+                <h3 class="card-text">${{ item.initial_price }}</h3>
+                <!-- <a href="{% url 'auction_details' id=item.id %}" class="btn btn-primary" style="margin-top: auto;">See More</a> -->
+            </div>
+        </div>   
+    {% endfor %}
+    </div>
+    
 {% endblock %}
