@@ -75,14 +75,14 @@ def addWatchlist(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
     item.watchlist.add(currentUser)
-    return HttpResponseRedirect(reverse("auctions/auction_details", args=(id, )))
+    return HttpResponseRedirect(reverse("auction_details", args=(id, )))
 
 
 def removeWatchlist(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
-    item.watchlist.add(currentUser)
-    return HttpResponseRedirect(reverse("auctions/auction_details", args=(id, )))
+    item.watchlist.remove(currentUser)
+    return HttpResponseRedirect(reverse("auction_details", args=(id, )))
 
 def index(request):
     items = Auction.objects.filter(is_active=True)
@@ -96,8 +96,14 @@ def index(request):
 # which means that the id should be first passed to HTML through Django views.py
 def auction_details(request, id):
     item = Auction.objects.get(pk=id)
+    currentUser = request.user
+    if currentUser in item.watchlist.all():
+        isWatchlist = True
+    else:
+        isWatchlist = False
     return render(request, "auctions/auction_details.html", {
         "item" : item,
+        "isWatchlist" : isWatchlist
     })
 
 def login_view(request):
