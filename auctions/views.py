@@ -37,8 +37,9 @@ def create_listing(request):
             user = owner
         )
         new_auction.save()
+        
         return render(request, "auctions/index.html", {
-
+            "items" : Auction.objects.filter(is_active=True)
         })
 
 def filter(request):
@@ -62,7 +63,7 @@ def filter(request):
 
 def watchlist(request):
     currentUser = request.user
-    # NOTE auction_watclist is RELATED_NAME. We use to access foreign key data for User (different models)
+    # NOTE auction_watchlist is RELATED_NAME. We use to access foreign key data for User (different models)
     items = currentUser.auction_watchlist.all()
     return render(request, "auctions/watchlist.html", {
         "watchlist_items" : items

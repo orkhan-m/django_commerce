@@ -29,6 +29,9 @@ class Auction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auction_user")
     date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.title}"
+
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bid_user")
     bid = models.FloatField(default=0)
