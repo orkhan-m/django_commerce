@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.contrib.auth.decorators import login_required
 
 from .models import User, Category, Auction, Comment, Bid
@@ -45,28 +45,46 @@ def create_listing(request):
 def filter(request):
     if request.method == "POST":
         category_filtered = request.POST['selected_category']
+
         if category_filtered == "all":
             activeItems = Auction.objects.filter(is_active=True)
             return render(request, "auctions/index.html", {
-            "items" : activeItems,
-            "categories" : Category.objects.all()
-            #Auction.category_choices
-        })
+                "items" : activeItems,
+                "categories" : Category.objects.all()
+            })
         else:
             category_filtered_pk = Category.objects.get(category=category_filtered)
             activeItems = Auction.objects.filter(is_active=True, category=category_filtered_pk)
             return render(request, "auctions/index.html", {
-            "items" : activeItems,
-            "categories" : Category.objects.all()
-            #Auction.category_choices
-        })    
+                "items" : activeItems,
+                "categories" : Category.objects.all()}) 
+
+def filter_watchlist(request):
+    if request.method == "POST":
+        category_filtered = request.POST['selected_category']
+        currentUser = request.user
+        if category_filtered == "all":
+            # NOTE here we have an access to foreign key through Users and then filter by Auction field
+            watchlistItems = currentUser.auction_watchlist.filter(is_active=True)
+            print(watchlistItems)
+            return render(request, "auctions/watchlist.html", {
+                "watchlistItems" : watchlistItems,
+                "categories" : Category.objects.all()
+            })
+        else:
+            category_filtered_pk = Category.objects.get(category=category_filtered)
+            watchlistItems = currentUser.auction_watchlist.filter(is_active=True, category = category_filtered_pk)
+            return render(request, "auctions/watchlist.html", {
+                "watchlistItems" : watchlistItems,
+                "categories" : Category.objects.all()}) 
 
 def watchlist(request):
     currentUser = request.user
     # NOTE auction_watchlist is RELATED_NAME. We use to access foreign key data for User (different models)
     items = currentUser.auction_watchlist.all()
     return render(request, "auctions/watchlist.html", {
-        "watchlist_items" : items
+        "watchlistItems" : items,
+        "categories" : Category.objects.all()
     })
 
 # NOTE Use "render(request, ..." when you want to return a template with passed data
@@ -85,6 +103,8 @@ def removeWatchlist(request, id):
     return HttpResponseRedirect(reverse("auction_details", args=(id, )))
 
 def index(request):
+    # NOTE return PATH, e.g., for index "/", for auction_details for the third item result = "auction_details/3" 
+    # print(request.path) 
     items = Auction.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
         "items" : items,

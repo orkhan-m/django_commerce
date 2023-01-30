@@ -4,7 +4,7 @@
     <h2>Watchlist Listings</h2>
     <hr>
     
-    <form action="{% url 'filter' %}" method="post">
+    <form action="{% url 'filter_watchlist' %}" method="post">
     {% csrf_token %}
         <select name="selected_category" class="selectpicker" data-style="btn-info">
             <option value="all">All</option>
@@ -17,14 +17,15 @@
 
     <hr>
     <div class="row mx-3">
-    {% for item in watchlist_items %}
+    {% for item in watchlistItems %}
         <div class="card" style="width: 18rem;">  
             <img class="card-img-top" src="{{ item.image_url }}" alt="{{ item.title }} image" style="height: 18rem; border: 1px gainsboro solid;">
             <div class="card-body" style=" display: flex; flex-direction: column;">
                 <h5 class="card-title">{{ item.title }}</h5>
+                <h4 class="card-text">Category: {{ item.category }}</h4>
                 <p class="card-text">{{ item.description }}</p>
-                <p class="card-text">${{ item.price }}</p>
-                <a href="{% url 'listing_ind' id=item.id %}" class="btn btn-primary" style="margin-top: auto;">See More</a>
+                <h3 class="card-text">${{ item.initial_price }}</h3>
+                <a href="{% url 'auction_details' id=item.id %}" class="btn btn-primary" style="margin-top: auto;">See More</a>
             </div>
         </div>   
     {% endfor %}
