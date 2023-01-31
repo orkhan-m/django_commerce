@@ -23,4 +23,23 @@
     <p>{{ item.description }}</p>
     <h3>Price: ${{ item.initial_price }}</h3>
 
+    <hr>
+    
+    <form method="POST" action="{% url 'add_comment' id=item.id %}">
+        {% csrf_token %}
+        <textarea cols="75" rows="4" name="comment" placeholder="Your comment"></textarea>
+        <br>
+        <button type="submit" class="btn btn-warning">Add Comment</button>
+    </form>
+
+    <h3>Comments:</h3>
+    <hr>
+
+    {% for comment in allComments %}
+        <strong>Posted by: {{ comment.user }}</strong>
+        <h6>{{ comment.date }}</h6>
+        <p>{{ comment.text }}</p>
+        <hr>
+    {% endfor %}
+
 {% endblock %}

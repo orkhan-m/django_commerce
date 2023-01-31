@@ -77,7 +77,25 @@ def filter_watchlist(request):
             return render(request, "auctions/watchlist.html", {
                 "watchlistItems" : watchlistItems,
                 "categories" : Category.objects.all()}) 
+@login_required
+def add_comment(request, id):
+    if request.method == "POST":
+        comment = request.POST["comment"]
+        currentUser = request.user
+        item = Auction.objects.get(pk=id)
 
+        new_comment=Comment(
+            text = comment,
+            user = currentUser,
+            item = item
+        )
+        new_comment.save()
+
+        return HttpResponseRedirect(reverse("auction_details", args=(id, )))
+
+
+
+@login_required
 def watchlist(request):
     currentUser = request.user
     # NOTE auction_watchlist is RELATED_NAME. We use to access foreign key data for User (different models)
@@ -87,15 +105,17 @@ def watchlist(request):
         "categories" : Category.objects.all()
     })
 
+
 # NOTE Use "render(request, ..." when you want to return a template with passed data
 # Use HttpResonse... when you want to redirect user to different URL or/and just make database changes
+@login_required
 def addWatchlist(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
     item.watchlist.add(currentUser)
     return HttpResponseRedirect(reverse("auction_details", args=(id, )))
 
-
+@login_required
 def removeWatchlist(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
@@ -117,13 +137,15 @@ def index(request):
 def auction_details(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
+    comments = Comment.objects.filter(item=item)
     if currentUser in item.watchlist.all():
         isWatchlist = True
     else:
         isWatchlist = False
     return render(request, "auctions/auction_details.html", {
         "item" : item,
-        "isWatchlist" : isWatchlist
+        "isWatchlist" : isWatchlist,
+        "allComments" : comments
     })
 
 def login_view(request):
