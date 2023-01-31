@@ -167,6 +167,10 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
+def bid(request, id):
+    if request.method == "POST":
+        current_price = float(request.POST[""])
+        return
 
 def logout_view(request):
     logout(request)

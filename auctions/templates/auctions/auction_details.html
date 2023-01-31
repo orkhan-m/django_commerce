@@ -23,6 +23,15 @@
     <p>{{ item.description }}</p>
     <h3>Price: ${{ item.initial_price }}</h3>
 
+    <div>
+        <form method="POST" action="{% url 'bid' id=item.id %}">
+            {% csrf_token %}
+            <label>Your bid:</label>
+            <input type="number" name="bid" min="0">
+            <input class="btn btn-info" type="submit" >
+        </form>
+    </div>
+
     <hr>
     
     <form method="POST" action="{% url 'add_comment' id=item.id %}">
