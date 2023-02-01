@@ -35,8 +35,11 @@ class Auction(models.Model):
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bid_user")
     bid = models.FloatField(default=0)
-    auction = models.ManyToManyField(Auction, related_name="bid_auction")
+    auction = models.ForeignKey(Auction, related_name="bid_auction", on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.auction} bid ${self.bid}'
 
 class Comment(models.Model):
     text = models.CharField(max_length=2000)

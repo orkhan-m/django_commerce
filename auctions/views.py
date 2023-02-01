@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, resolve
 from django.contrib.auth.decorators import login_required
+from django.db.models import Max
 
 from .models import User, Category, Auction, Comment, Bid
 
@@ -37,6 +38,19 @@ def create_listing(request):
             user = owner
         )
         new_auction.save()
+
+        # NOTE to pass a foreign to Auction table, we need to retrieve it through Primary Key table
+        # category = Category.objects.get(category=request.POST["category"])
+        title_for_bid = Auction.objects.get(title=request.POST["title"])
+        # bid_for_bid = Auctions.object.get(initial_price=request.POST)
+
+        fill_bid = Bid(
+            user = owner,
+            auction =  title_for_bid,
+            bid = initial_price
+        )
+
+        fill_bid.save()
         
         return render(request, "auctions/index.html", {
             "items" : Auction.objects.filter(is_active=True)
@@ -169,7 +183,35 @@ def login_view(request):
 
 def bid(request, id):
     if request.method == "POST":
-        current_price = float(request.POST[""])
+        currentUser = request.user
+        item = Auction.objects.get(pk=id)
+        current_price = float(item.initial_price)
+        new_bid_str = request.POST["bid"]
+        try:
+            new_bid = float(new_bid_str) 
+        except:
+            new_bid = 0.0
+
+        max_bid_dict = Bid.objects.filter(auction=id).aggregate(Max('bid'))
+        max_bid = max_bid_dict['bid__max']
+        print(max_bid)
+
+        if (new_bid == False or new_bid <= current_price or max_bid >= new_bid): # TODO add and less than highest bid
+            return HttpResponseRedirect(reverse("auction_details", args=[id]))
+        else:
+            new_bid_line = Bid( 
+                user = currentUser, 
+                bid = new_bid,
+                auction = item
+            )
+            new_bid_line.save()
+
+            item.last_price = new_bid
+            item.save()
+            
+            return HttpResponseRedirect(reverse("auction_details",args=[id]))
+            
+
         return
 
 def logout_view(request):
