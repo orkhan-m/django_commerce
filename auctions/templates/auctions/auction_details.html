@@ -21,7 +21,11 @@
     <h4>Category: {{ item.category }}</h4>
     <img src="{{ item.image_url }}" alt="Image {{ item.title }}" height="400">
     <p>{{ item.description }}</p>
-    <h3>Price: ${{ item.initial_price }}</h3>
+    {% if item.last_price == 0 or item.last_price == "" or item.last_price == None %}
+        <h3>Price: ${{ item.initial_price }}</h3>
+    {% elif item.last_price > item.initial_price %}
+        <h3>Price: ${{ item.last_price }}</h3>
+    {% endif %}
 
     <div>
         <form method="POST" action="{% url 'bid' id=item.id %}">

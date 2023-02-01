@@ -192,10 +192,11 @@ def bid(request, id):
         except:
             new_bid = 0.0
 
-        max_bid = Bid.objects.filter(auction=id).aggregate(Max('bid'))
+        max_bid_dict = Bid.objects.filter(auction=id).aggregate(Max('bid'))
+        max_bid = max_bid_dict['bid__max']
         print(max_bid)
 
-        if new_bid == False or new_bid <= current_price: # TODO add and less than highest bid
+        if (new_bid == False or new_bid <= current_price or max_bid >= new_bid): # TODO add and less than highest bid
             return HttpResponseRedirect(reverse("auction_details", args=[id]))
         else:
             new_bid_line = Bid( 
@@ -203,8 +204,11 @@ def bid(request, id):
                 bid = new_bid,
                 auction = item
             )
-
             new_bid_line.save()
+
+            item.last_price = new_bid
+            item.save()
+            
             return HttpResponseRedirect(reverse("auction_details",args=[id]))
             
 
