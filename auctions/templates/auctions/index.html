@@ -23,12 +23,14 @@
             <div class="card-body" style=" display: flex; flex-direction: column;">
                 <h5 class="card-title">{{ item.title }}</h5>
                 <h4 class="card-text">Category: {{ item.category }}</h4>
+                <h5 class="card-text">Owner: {{ item.user }}</h5>
                 <p class="card-text">{{ item.description }}</p>
                 {% if item.last_price == 0 or item.last_price == "" or item.last_price == None %}
                     <h3 class="card-text">${{ item.initial_price }}</h3>
                 {% elif item.last_price > item.initial_price %}
                     <h3 class="card-text">${{ item.last_price }}</h3>
                 {% endif %}
+                <h6 class="card-text" style="color: grey;">Initial Price: ${{ item.initial_price }} by {{}}</h6>
                 <a href="{% url 'auction_details' id=item.id %}" class="btn btn-primary" style="margin-top: auto;">See More</a>
             </div>
         </div>   
