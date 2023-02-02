@@ -140,6 +140,7 @@ def index(request):
     # NOTE return PATH, e.g., for index "/", for auction_details for the third item result = "auction_details/3" 
     # print(request.path) 
     items = Auction.objects.filter(is_active=True)
+    
     return render(request, "auctions/index.html", {
         "items" : items,
         "categories" : Category.objects.all()
@@ -211,9 +212,6 @@ def bid(request, id):
             
             return HttpResponseRedirect(reverse("auction_details",args=[id]))
             
-
-        return
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
