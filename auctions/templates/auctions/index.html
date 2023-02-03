@@ -30,7 +30,7 @@
                 {% elif item.last_price > item.initial_price %}
                     <h3 class="card-text">${{ item.last_price }}</h3>
                 {% endif %}
-                <h6 class="card-text" style="color: grey;">Initial Price: ${{ item.initial_price }} by {{}}</h6>
+                <h6 class="card-text" style="color: grey;">Initial Price: ${{ item.initial_price }}</h6>
                 <a href="{% url 'auction_details' id=item.id %}" class="btn btn-primary" style="margin-top: auto;">See More</a>
             </div>
         </div>   

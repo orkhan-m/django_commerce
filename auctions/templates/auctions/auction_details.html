@@ -2,6 +2,13 @@
 
 {% block body %}
     <div>
+        {% if response == "Bid Failed" %}
+            <div class="alert alert-danger" role="alert">{{ response }}</div>
+        {% elif response == "Bid Successful" %}
+            <div class="alert alert-success" role="alert">{{ response }}</div>
+        {% endif %}
+    </div>
+    <div>
         {% if user.is_authenticated %}
             {% if isWatchlist %}
                 <form action="{% url 'removeWatchlist' id=item.id %}" method="POST">
