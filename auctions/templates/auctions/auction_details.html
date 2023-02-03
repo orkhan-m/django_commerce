@@ -2,6 +2,10 @@
 
 {% block body %}
     <div>
+        {% if user_final != False and item.is_active == False and user_final == user.username %}
+            <div class="alert alert-success" role="alert">You "{{user_final}}" won the auction with price of ${{ price_final }}</div>
+        {% endif %}
+
         {% if response == "Bid Failed" %}
             <div class="alert alert-danger" role="alert">{{ response }}</div>
         {% elif response == "Bid Successful" %}
@@ -42,6 +46,14 @@
             <input type="number" name="bid" min="0">
             <input class="btn btn-info" type="submit" >
         </form>
+    </div>
+    <div>
+        {% if close_available and item.last_price != None %}
+            <form method="POST" action="{% url 'close_bid' id=item.id %}">
+                {% csrf_token %}
+                <input type="submit" name="close" value="Close the auction." class="btn btn-primary">
+            </form>
+        {% endif %}
     </div>
 
     <hr>

@@ -151,16 +151,68 @@ def index(request):
 # which means that the id should be first passed to HTML through Django views.py
 def auction_details(request, id):
     item = Auction.objects.get(pk=id)
+
+    if item.is_active == False:
+        winner = Bid.objects.filter(auction=id).values()
+        for i in winner:
+            if i['bid'] == item.last_price:
+                user_winner = User.objects.get(pk=i['user_id'])
+                price_final = item.last_price
+                user_final = user_winner.username
+    else:
+        user_final = False
+
     currentUser = request.user
     comments = Comment.objects.filter(item=item)
+    
     if currentUser in item.watchlist.all():
         isWatchlist = True
     else:
         isWatchlist = False
+
+    if currentUser == item.user:
+        close_available = True
+    else:
+        close_available = False
+
+    if item.is_active == False:
+        return render(request, "auctions/auction_details.html", {
+            "item" : item,
+            "isWatchlist" : isWatchlist,
+            "allComments" : comments,
+            "close_available" : close_available,
+            "user_final" : user_final,
+            "price_final" : price_final
+        })
+    else:
+        return render(request, "auctions/auction_details.html", {
+            "item" : item,
+            "isWatchlist" : isWatchlist,
+            "allComments" : comments,
+            "close_available" : close_available
+        })
+
+
+
+def close_bid(request, id):
+    
+    item = Auction.objects.get(pk=id)
+    item.is_active = False
+    item.save()
+
+    winner = Bid.objects.filter(auction=id).values()
+    
+    # winner_user  = winner.user
+    for i in winner:
+        if i['bid'] == item.last_price:
+            user_winner = User.objects.get(pk=i['user_id'])
+            price_final = item.last_price
+            user_final = user_winner.username
+
     return render(request, "auctions/auction_details.html", {
         "item" : item,
-        "isWatchlist" : isWatchlist,
-        "allComments" : comments
+        "user_final" : user_final,
+        "price_final" : price_final
     })
 
 def login_view(request):
@@ -195,7 +247,6 @@ def bid(request, id):
 
         max_bid_dict = Bid.objects.filter(auction=id).aggregate(Max('bid'))
         max_bid = max_bid_dict['bid__max']
-        print(max_bid)
 
         if (new_bid == False or new_bid <= current_price or max_bid >= new_bid): # TODO add and less than highest bid
             response = "Bid Failed"
