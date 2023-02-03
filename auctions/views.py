@@ -127,20 +127,20 @@ def addWatchlist(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
     item.watchlist.add(currentUser)
-    return HttpResponseRedirect(reverse("auction_details", args=(id, )))
+    return HttpResponseRedirect(reverse("auction_details", args=[id]))
 
 @login_required
 def removeWatchlist(request, id):
     item = Auction.objects.get(pk=id)
     currentUser = request.user
     item.watchlist.remove(currentUser)
-    return HttpResponseRedirect(reverse("auction_details", args=(id, )))
+    return HttpResponseRedirect(reverse("auction_details", args=[id]))
 
 def index(request):
     # NOTE return PATH, e.g., for index "/", for auction_details for the third item result = "auction_details/3" 
     # print(request.path) 
     items = Auction.objects.filter(is_active=True)
-    
+
     return render(request, "auctions/index.html", {
         "items" : items,
         "categories" : Category.objects.all()
@@ -198,8 +198,14 @@ def bid(request, id):
         print(max_bid)
 
         if (new_bid == False or new_bid <= current_price or max_bid >= new_bid): # TODO add and less than highest bid
-            return HttpResponseRedirect(reverse("auction_details", args=[id]))
+            response = "Bid Failed"
+            return render(request, "auctions/auction_details.html", {
+                "response" : response,
+                "item" : item
+            })
+            # return HttpResponseRedirect(reverse("auction_details", args=[id]))
         else:
+            response = "Bid Successful"
             new_bid_line = Bid( 
                 user = currentUser, 
                 bid = new_bid,
@@ -210,7 +216,11 @@ def bid(request, id):
             item.last_price = new_bid
             item.save()
             
-            return HttpResponseRedirect(reverse("auction_details",args=[id]))
+            return render(request, "auctions/auction_details.html", {
+                "response" : response,
+                "item" : item
+            })
+            # return HttpResponseRedirect(reverse("auction_details",args=[id]))
             
 def logout_view(request):
     logout(request)
